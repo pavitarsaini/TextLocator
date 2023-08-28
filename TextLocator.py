@@ -16,15 +16,28 @@ def find_sentence(sentence, region, take_screenshot, moveMouse):
     gray = image.convert('L')
     
     data = pytesseract.image_to_data(gray, output_type=pytesseract.Output.DICT)
-    words = sentence.split()
+    data['text'] = list(map(str.lower,data['text']))
+
+    words = sentence.lower().split()
     
     indices = []
+    search_region = 0
+
     for word in words:
-        try:
-            index = data['text'].index(word)
-            indices.append(index)
-        except ValueError:
-            pass
+
+        while True:
+            try:
+                index = data['text'].index(word, search_region)
+
+                if (len(indices) != 0 and index < indices[-1]): 
+                    continue
+                else:
+                    search_region = index
+                    indices.append(index)
+                    break;
+
+            except ValueError:
+                pass
     
     if indices:
 
